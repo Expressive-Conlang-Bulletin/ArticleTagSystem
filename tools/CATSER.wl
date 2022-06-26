@@ -14,6 +14,7 @@ ShortenTagName
 QueryTagFullName
 NestedRuleToList
 GenerateShortenDictionary
+QueryByHeadSubsequence
 
 
 Begin["`Private`"]
@@ -58,7 +59,26 @@ GenerateShortenDictionary[tagNames_] :=
 	NestedRuleToList/@tagNames //AssociationMap[ShortenTagName] //KeyValueMap[OperatorApplied[Rule][#]/@#2&] //Catenate//Association
 
 
-QueryTagFullName[q_, dict_] := NestWhile[, {dict[q]}, ]
+QueryByHeadSubsequence[{q__String}, dict_Association] :=Position[Keys@dict, {q, ___}] //Replace[{
+	{} :> Missing["NotFound"],
+	{single_} :> Extract[dict, single],
+	multiple:_List :> Extract[dict, multiple]
+}]
+
+
+getRestByCommonLast[long_, common_] :=
+	Replace[res:Except@_Missing :> Reverse@Take[#, First@res-1]]@FirstPosition[Last@common]@# &@Reverse@long
+(*Reap@NestWhile[(Sow@#1;#2)&@@TakeDrop[#,-1]&, long, #=!={}&&UnsameQ@@Last/@{#,common}&,1,10] //
+	MapAt[Reverse@Catenate@#[[1]]&, {2}]*)
+
+
+QueryTagFullName[query_List, dict_] := Catch[With[{queries = Drop[query,-#]&/@(Range@Length@query-1)},
+	Function[q, Switch[#,
+		_Missing, #,
+		{{__String}..}, Throw[{#, getRestByCommonLast[query, #]}&@Fold[LongestCommonSubsequence, #], QueryTagFullName],
+		{__String}, Throw[{#, getRestByCommonLast[query, #]}, QueryTagFullName]
+	] &@QueryByHeadSubsequence[q, dict]] /@ queries
+], QueryTagFullName]
 
 
 End[]
