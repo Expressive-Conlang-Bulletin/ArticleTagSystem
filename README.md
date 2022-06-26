@@ -6,8 +6,8 @@
 
 本项目可简称为CATS(Conlang Article Tag System)。
 
-## [工程语研究标签系统](docs/EnglangResearch.md)
+## [工程语研究标签系统](docs/CATSER.md)
 
 由于工程语研究的目标比较统一、问题结构较为明确，其标签系统将可以包含较细节的语义信息，进行更细致的分类。可以在没有足够的实践数据的情况下，预先进行一些初始的设计，之后再逐步迭代完善。
 
-本标签系统可简称为CATS-ER（Englang Research）
+本标签系统可简称为CATS-ER（CATS - Englang Research）
